@@ -1,0 +1,64 @@
+resources:
+  jobs:
+    end_to_end_healthcare_project_job:
+      name: end-to-end-healthcare-project-job
+      tasks:
+        - task_key: diagnosis_raw_ingestion_task
+          notebook_task:
+            notebook_path: ../bronze/diagnosis_raw_data_ingestion
+            source: WORKSPACE
+
+        - task_key: diagnosis_silver_task
+          depends_on:
+            - task_key: diagnosis_raw_ingestion_task
+          notebook_task:
+            notebook_path: ../silver/dim_diagnosis_ingestion
+            source: WORKSPACE
+
+        - task_key: hospitals_ingestion_task
+          notebook_task:
+            notebook_path: ../bronze/hospitals_raw_data_ingestion
+            source: WORKSPACE
+
+        - task_key: hospitals_silver_task
+          depends_on:
+            - task_key: hospitals_ingestion_task
+          notebook_task:
+            notebook_path: ../silver/dim_hospital_ingestion
+            source: WORKSPACE
+
+        - task_key: patients_ingestion_task
+          notebook_task:
+            notebook_path: ../bronze/patients_raw_data_ingestion
+            source: WORKSPACE
+
+        - task_key: patients_silver_task
+          depends_on:
+            - task_key: patients_ingestion_task
+          notebook_task:
+            notebook_path: ../silver/dim_patient_ingestion
+            source: WORKSPACE
+
+        - task_key: visits_raw_ingestion_task
+          notebook_task:
+            notebook_path: ../bronze/visits_raw_data_ingestion
+            source: WORKSPACE
+
+        - task_key: fact_visit_ingestion
+          depends_on:
+            - task_key: diagnosis_silver_task
+            - task_key: hospitals_silver_task
+            - task_key: patients_silver_task
+            - task_key: visits_raw_ingestion_task
+          notebook_task:
+            notebook_path: ../silver/dim_fact_visit_ingestion
+            source: WORKSPACE
+        - task_key: resubmission_analysis
+          depends_on:
+            - task_key: fact_visit_ingestion
+          notebook_task:
+            notebook_path: ../gold/resubmission_analysis
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
