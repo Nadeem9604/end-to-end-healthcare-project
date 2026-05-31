@@ -1,0 +1,12 @@
+# Databricks Asset Bundle artifacts
+.databricks/
+*.lock.hcl
+
+
+
+# Environment files
+.env
+.env.local
+
+# IDE settings
+.vscode/
